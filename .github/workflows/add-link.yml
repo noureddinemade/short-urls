@@ -1,0 +1,70 @@
+name: Add link from issue
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+concurrency:
+  group: add-link
+  cancel-in-progress: false
+
+jobs:
+  add:
+    # Only the repo owner can add links. Anyone else's issue is ignored.
+    if: >-
+      github.event.issue.user.login == github.repository_owner &&
+      contains(github.event.issue.labels.*.name, 'new-link')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - id: add
+        run: node scripts/add-link.mjs
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+
+      - name: Commit and push
+        if: steps.add.outputs.result == 'ok'
+        env:
+          SLUG: ${{ steps.add.outputs.slug }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add links.yml
+          git commit -m "Add link: $SLUG (#$ISSUE)"
+          git push
+
+      # Pushes made by the workflow token don't trigger other workflows, so start the build directly.
+      - name: Start build
+        if: steps.add.outputs.result == 'ok'
+        run: gh workflow run build.yml --ref "${{ github.event.repository.default_branch }}"
+
+      - name: Close issue
+        if: steps.add.outputs.result == 'ok'
+        env:
+          SHORT: https://${{ steps.add.outputs.domain }}/${{ steps.add.outputs.slug }}
+          DEST: ${{ steps.add.outputs.url }}
+        run: |
+          gh issue close "$ISSUE" --comment "Added $SHORT → $DEST. It'll be live in a couple of minutes."
+
+      - name: Report problem
+        if: steps.add.outputs.result == 'error'
+        env:
+          MESSAGE: ${{ steps.add.outputs.message }}
+        run: |
+          gh issue comment "$ISSUE" --body "Couldn't add this link: $MESSAGE"

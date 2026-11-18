@@ -1,0 +1,21 @@
+# Domain this site is served from (also written to the CNAME file).
+domain: zhr.au
+
+# Where the bare domain (https://zhr.au/) redirects.
+root:
+  url: https://noureddine.biz
+
+# Short links. The key is the path: "gh" -> https://zhr.au/gh
+#
+# Only `url` is required. Preview details (title, description, image,
+# site_name) are copied from the destination automatically. Set any of
+# them here to override the copied value.
+#
+# Example:
+#   gh:
+#     url: https://github.com/yourname
+#     title: My GitHub
+#     image: https://example.com/preview.png
+links:
+  small-interactions:
+    url: https://noureddinemade.substack.com/p/small-interactions

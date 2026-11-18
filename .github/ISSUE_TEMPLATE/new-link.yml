@@ -1,0 +1,32 @@
+name: New link
+description: Add a short link
+title: New link
+labels: [new-link]
+body:
+  - type: input
+    attributes:
+      label: Short name
+      description: 'The path, e.g. "gh" for https://zhr.au/gh. Letters, numbers, "-" and "_".'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Destination URL
+      placeholder: https://
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: The fields below are optional. Leave them blank to copy them from the destination.
+  - type: input
+    attributes:
+      label: Title (optional)
+  - type: textarea
+    attributes:
+      label: Description (optional)
+  - type: input
+    attributes:
+      label: Image URL (optional)
+  - type: input
+    attributes:
+      label: Site name (optional)

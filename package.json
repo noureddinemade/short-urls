@@ -1,0 +1,12 @@
+{
+  "name": "zhr-au",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "node-html-parser": "^7.0.1",
+    "yaml": "^2.6.1"
+  }
+}
